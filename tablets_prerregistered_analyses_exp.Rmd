@@ -1,0 +1,501 @@
+---
+title: "Suplementary Material 2: Prerregistered analyses for experiment"
+author: "Angel V. Jimenez"
+date: "4 July 2019"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+# DATASET
+# DATASET
+setwd("C:/files/Angel/tablets/experiment")
+d<-read.csv("tablets_exp.csv")
+# Gender as factor
+d$GENDER <- ifelse((d$GENDER==1),"Male",
+                   ifelse((d$GENDER==2),"female","other"))
+d$GENDER <- as.factor(d$GENDER)
+```
+
+# HYPOTHESES
+
+We will test two hypotheses: 
+
+H1: The arguments provided by high prestige sources are better recalled than arguments provided by low prestige sources.
+
+H2: The arguments provided by a high prestige source within the relevant domain will be better recalled than the arguments provided by a high prestige source outside the relevant domain.
+
+```{r}
+# Explore variables in dataset
+str(d)
+# Summary statistics to check that everything is right
+summary(d)
+# 6 first observations
+head(d)
+# 6 last observations
+tail(d)
+```
+
+# DEMOGRAPHICS
+
+```{r}
+# Creating new dataset with only one row per participant
+dat <- d[ which(d$X=='1'), ]
+# Frequencies by gender
+summary(dat$GENDER)
+# Range of ages
+range(dat$AGE) 
+# Mean of age
+mean(dat$AGE) 
+# Standard Deviation of age
+sd(dat$AGE) 
+# Histogram for age
+breaks<-c(15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65)
+hist(dat$AGE,
+     main="Histogram for Age",
+     xlab="Age",
+     border="blue",
+     col="green",
+     breaks = breaks,
+     xlim=c(10,65),
+     ylim=c(0,50),
+     prob = FALSE,
+     xaxt ="n")
+axis(side=1, at=seq(15,65, 5), labels=seq(15,65,5))
+```
+
+
+# GRAPHICAL DISPLAYS OF THE RAW DATA
+
+```{r}
+# Opening ggplot2 package
+library(ggplot2)
+# Creation of colorblind-friendly pallette
+cbPalette <- c("#D55E00", "#E69F00", "#56B4E9", "#009E73", "#999999", "#CC79A7")
+
+# Line plot of mean number of correctly recalled propositions recalled by each generation with 1.96 standard errors with view ("Protablets" vs "Antitablets") as grouping factor. 
+# Plot
+(viewplot<-ggplot(d, aes(GENERATION, RECALL, colour = VIEW)) + stat_summary(fun.y = mean, geom = "line", size = 1.5, aes(group = VIEW, colour = VIEW)) + stat_summary(fun.y = mean, geom = "point", size = 3, aes(shape = VIEW)) + stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.2, size = 1.96) + theme_classic(base_size = 16) + labs(x = "Generation", y = "Correctly Recalled Arguments") + scale_colour_manual(values=cbPalette))
+```
+
+
+```{r}
+# Plot
+(source_plot<-ggplot(d, aes(GENERATION, RECALL, colour = SOURCE)) + stat_summary(fun.y = mean, geom = "line", size = 1.5, aes(group = SOURCE, colour = SOURCE)) + stat_summary(fun.y = mean, geom = "point", size = 3, aes(shape = SOURCE)) + stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.2, size = 1.96) + theme_classic(base_size = 16) + labs(x = "Generation", y = "Correctly Recalled Arguments") + scale_colour_manual(values=cbPalette))
+```
+
+
+
+
+```{r}
+
+# Plot
+viewplot<-ggplot(d, aes(GENERATION, RECALL, colour = VIEW)) + stat_summary(fun.y = mean, geom = "line", size = 1.5, aes(group = VIEW, colour = VIEW)) + stat_summary(fun.y = mean, geom = "point", size = 3, aes(shape = VIEW)) + stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.2, size = 1.96) + theme_classic(base_size = 20) + labs(x = "Generation", y = "Correctly Recalled Propositions") + scale_colour_manual(values=cbPalette)+theme(legend.position = "bottom")+expand_limits(y=c(0,8))
+
+# Line plot of mean number of correctly recalled propositions recalled by each generation with 1.96 standard errors with source ("Father" vs "Doctor") as grouping factor. 
+
+
+
+# Plot
+source_plot<-ggplot(d, aes(GENERATION, RECALL, colour = SOURCE)) + stat_summary(fun.y = mean, geom = "line", size = 1.5, aes(group = SOURCE, colour = SOURCE)) + stat_summary(fun.y = mean, geom = "point", size = 3, aes(shape = SOURCE)) + stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.2, size = 1.96) + theme_classic(base_size = 20) + labs(x = "Generation", y = "Correctly Recalled Propositions") + scale_colour_manual(values=c("lightgreen", "steelblue", "black"))+theme(legend.position = "bottom")+expand_limits(y=c(0,8))
+
+library(gridExtra)
+grid.arrange(viewplot, source_plot, ncol=2)  
+```
+
+
+
+
+
+
+
+```{r}
+library(Hmisc)
+(split_plot<-ggplot(d, aes(GENERATION, RECALL, colour = SOURCE)) + stat_summary(fun.y = mean, geom = "line", size = 1.3, aes(group = SOURCE, colour = SOURCE)) + stat_summary(fun.y = mean, geom = "point", size = 5, aes(shape = SOURCE)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2, size = 1.96) + theme_classic() + facet_wrap(~ CONDITION) + labs(x = "Generation", y = "Correctly Recalled Arguments") + scale_colour_manual(values=cbPalette))
+```
+ 
+
+```{r}
+(split_plot<-ggplot(d, aes(GENERATION, RECALL, colour = SOURCE)) + stat_summary(fun.y = mean, geom = "line", size = 1.3, aes(group = SOURCE, colour = SOURCE)) + stat_summary(fun.y = mean, geom = "point", size = 5, aes(shape = SOURCE)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2, size = 1.96) + theme_classic() + facet_wrap(~ CONDITION) + labs(x = "Generation", y = "Correctly Recalled Arguments") + scale_colour_manual(values=cbPalette))
+```
+
+
+
+```{r}
+(chain_plot<-ggplot(d, aes(GENERATION, RECALL, colour = SOURCE)) + stat_summary(fun.y = mean, geom = "line", size = 1.3, aes(group = SOURCE, colour = SOURCE)) + stat_summary(fun.y = mean, geom = "point", size = 1, aes(shape = SOURCE)) + theme_classic() + facet_wrap(~ CHAIN) + labs(x = "Generation", y = "Correctly Recalled Arguments") + scale_colour_manual(values=cbPalette))
+```
+This graph shows the results for each of the chains. 
+
+# EXPLORATORY ANALYSES OF THE OUTCOME VARIABLE (NUMBER OF CORRECTLY RECALLED PROPOSITIONS)
+
+```{r}
+# Exploring the distribution of the outcome variable (Number of Propositions Correctly Recalled)
+hist(d$RECALL, 
+     main="Histogram for the Outcome Variable (Recall)", 
+     xlab="Number of Propositions Correctly Recalled", 
+     border="blue", 
+     col="green", 
+     xlim=c(0,14), 
+     ylim=c(0,100),
+     prob = FALSE, breaks = c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14)) 
+```
+
+The histogram shows that the most frequent number of propositions correctly recalled is 3 and the minimum 0.
+
+# NULL MODELS FOR PREDICTING RECALL
+```{r}
+# mo.0: fixed intercept model
+mo.0<-glm(RECALL~1, data = d, family="poisson")
+# mo.0a: random intercept model with chain as a random effect
+library(lme4)
+mo.0a<-glmer(RECALL ~ 1 + (1|CHAIN), data = d, family = "poisson")
+# mo.0b: random intercept model with participant as a random effect
+mo.0b<-glmer(RECALL ~ 1 + (1|PARTICIPANT), data = d, family = "poisson")
+# mo.0c: random intercept model with participant nested within chain as random effects
+mo.0c<-glmer(RECALL ~ 1 + (1|CHAIN/PARTICIPANT), data = d, family = "poisson")
+# 
+# Model comparisons
+AIC(mo.0, mo.0a, mo.0b, mo.0c)
+```
+The random intercept models with participant as a random effect (AIC=1467.701) and with participant nested within chain as random effects (AIC=1468.811) have a similar fit and their fit is better to the data than both the fixed intercept model (AIC=1487.859) and the random intercept model with chain as random effect (AIC=1479.631)
+
+
+
+```{r}
+# GENERATION MODELs
+# Generation model with participant nested within chain as random effects
+mo.1a<-glmer(RECALL ~ GENERATION + (1|CHAIN/PARTICIPANT), data = d, family = "poisson")
+# Generation model with chain as random effect
+mo.1b<-glmer(RECALL ~ GENERATION + (1|CHAIN), data = d, family = "poisson")
+# Model fit comparisons
+AIC(mo.1a, mo.1b)
+```
+The model fit of the generation model with chain as random effect (AIC = 1333.987) is better than the fit of the generation model with participant nested within chain as random effects (AIC = 1331.987). We decided to use the generation model with chain as unique random effect as a base for the following models. 
+
+```{r}
+# CONTROL MODELS
+# View model
+mo.2a<-glmer(RECALL ~ GENERATION + VIEW + (1|CHAIN), data = d, family = "poisson")
+# View model with its interaction with generation
+mo.2b<-glmer(RECALL ~ GENERATION * VIEW + (1|CHAIN), data = d, family = "poisson")
+# Pretest model
+mo.3a<-glmer(RECALL ~ GENERATION + VIEW * PRE_AGREE + (1|CHAIN), data = d, family = "poisson")
+
+# Model comparisons
+AIC(mo.1b, mo.2a, mo.2b, mo.3a)
+```
+
+All the control models have a better fit than the selected generation model (AIC=1331.987). The best fitting model is the model with generation and view as fixed effects without interaction (AIC=1323.213)
+
+
+
+```{r}
+# Coefficient Plot of the View Model with Chain as Random Effect
+library(coefplot)
+coefplot(mo.2a)
+# Summary of View Model with Chain as Random Effect
+library(arm)
+display(mo.2a)
+```
+The selected control model clearly shows a decreased in the number of propositions correctly recalled over generations and that the protablets views is worse recalled than the antitablets view. 
+
+
+```{r}
+# Test of H1: The arguments provided by high prestige sources are better recalled than arguments provided by low prestige sources. 
+# SOURCE MODELS
+# Selecting "Cleaner" as reference category
+d <- within(d, SOURCE <- relevel(SOURCE, ref = 'CLEANER'))
+# Source model
+mo.4a<-glmer(RECALL ~ GENERATION + SOURCE + (1|CHAIN), data = d, family = "poisson")
+# Source model with its interaction with generation
+mo.4b<-glmer(RECALL ~ GENERATION * SOURCE + (1|CHAIN), data = d, family = "poisson")
+AIC(mo.1b, mo.2a, mo.4a, mo.4b)
+library(arm)
+display(mo.4a)
+detach("package:arm", unload=TRUE)
+library(coefplot)
+coefplot(mo.4a)
+library(arm)
+display(mo.4b)
+detach("package:arm", unload=TRUE)
+coefplot(mo.4b)
+```
+The source model (AIC = 1335.088) and the model with the interaction between source and generation (AIC=1346.096) have a worse fit than both the control (AIC=1331.987) and the view models (AIC=1346.096). This does not support H1. 
+
+Because we have shown than the view about tablets has an effect, we decided to run additional source models including view as an additional fixed effect. 
+
+```{r}
+# Selecting "Cleaner" as reference category
+d <- within(d, SOURCE <- relevel(SOURCE, ref = 'CLEANER'))
+# Source model + VIEW
+mo.4c<-glmer(RECALL ~ GENERATION + SOURCE + VIEW + (1|CHAIN), data = d, family = "poisson")
+mo.4d<-glmer(RECALL ~ GENERATION * SOURCE + VIEW + (1|CHAIN), data = d, family = "poisson")
+mo.4e<-glmer(RECALL ~ GENERATION + SOURCE * VIEW + (1|CHAIN), data = d, family = "poisson")
+AIC(mo.1b, mo.2a, mo.4c, mo.4d, mo.4e)
+library(arm)
+display(mo.4c)
+detach("package:arm", unload=TRUE)
+coefplot(mo.4c)
+```
+The model fit of these models is worse than the view model. 
+
+
+```{r}
+# Test of H2: The arguments provided by high relevance sources are better recalled than arguments provided by low relevance sources. 
+# SOURCE MODELS
+# Selecting "Head of Education" as reference category
+d <- within(d, SOURCE <- relevel(SOURCE, ref = 'EDUCATOR'))
+# Source model
+mo.4a<-glmer(RECALL ~ GENERATION + SOURCE + (1|CHAIN), data = d, family = "poisson")
+# Source model with its interaction with generation
+mo.4b<-glmer(RECALL ~ GENERATION * SOURCE + (1|CHAIN), data = d, family = "poisson")
+AIC(mo.1b, mo.2a, mo.4a, mo.4b)
+library(arm)
+display(mo.4a)
+detach("package:arm", unload=TRUE)
+library(coefplot)
+coefplot(mo.4a)
+library(arm)
+display(mo.4b)
+detach("package:arm", unload=TRUE)
+coefplot(mo.4b)
+```
+These are the same models. The only change is that the reference category is "educator" now
+
+# MODEL VALIDATION FOR BEST FITTING MODEL TO PREDICT RECALL
+
+```{r} 
+# ANALYSIS OF OVERDISPERSION
+# FUNCTION BY HARRISON (2014)
+od.point<-function(modelobject){
+  x<-sum(resid(modelobject,type="pearson")^2)
+  rdf<-summary(modelobject)$AICtab[5]
+  return(x/rdf)
+}
+od.point(mo.2a)
+```
+There is not overdispersion, as the od.point is lower than 1. 
+
+```{r}
+# Fitted vs residual plot
+plot(mo.2a)
+library(lattice)
+#QQPlot
+qqmath(mo.2a)
+```
+They look fine
+
+# POST-HOC TESTS FOR CONDITION 1
+```{r}
+d <- within(d, SOURCE <- relevel(SOURCE, ref = 'CLEANER'))
+#  Condition 1: cleaner vs Head of the Department of Education of a leading university
+newdata1 <- d[ which(d$CONDITION=="C1"), ] # Select data from condition 1
+# Source model for Condition 1
+post.hoc1<-glmer(RECALL ~ GENERATION + SOURCE + (1|CHAIN), newdata1, family = "poisson")
+# Interaction model for Condition 1
+interaction.post.hoc1<-glmer(RECALL ~ GENERATION * SOURCE + (1|CHAIN), newdata1, family = "poisson")
+# Generation-only model for condition 1
+generation.post.hoc1<-glmer(RECALL ~ GENERATION + (1|CHAIN), newdata1, family="poisson")
+# View model for condition 1
+view.post.hoc1<-glmer(RECALL ~ GENERATION + VIEW + (1|CHAIN), newdata1, family = "poisson")
+# Source + view model
+sourceview.post.hoc1<-glmer(RECALL ~ GENERATION + SOURCE+ VIEW + (1|CHAIN), newdata1, family = "poisson")
+# Model comparisons
+AIC(post.hoc1, generation.post.hoc1, interaction.post.hoc1, view.post.hoc1, sourceview.post.hoc1)
+
+# Summary of the Source Model for Condition 1
+library(arm)
+display(post.hoc1)
+# Coefficient Plot of the Source Model for Condition 1
+detach("package:arm", unload=TRUE)
+coefplot(post.hoc1)
+# Summary of the Interaction Model for Condition 1
+library(arm)
+display(interaction.post.hoc1)
+# Coefficient Plot for the Interaction Model for Condition 1
+detach("package:arm", unload=TRUE)
+coefplot(interaction.post.hoc1)
+
+# Summary of the View Model for Condition 1
+library(arm)
+display(view.post.hoc1)
+# Coefficient Plot of the Source Model for Condition 1
+detach("package:arm", unload=TRUE)
+coefplot(view.post.hoc1)
+
+# Summary of the View Model for Condition 1
+library(arm)
+display(sourceview.post.hoc1)
+# Coefficient Plot of the Source Model for Condition 1
+detach("package:arm", unload=TRUE)
+coefplot(sourceview.post.hoc1)
+
+```
+Similar results as for all data together
+
+# POST-HOC TESTS FOR CONDITION 2
+```{r}
+d <- within(d, SOURCE <- relevel(SOURCE, ref = 'CLEANER'))
+#  Condition 2: cleaner vs Head of the Department of Education of a leading university
+newdata2 <- d[ which(d$CONDITION=="C2"), ] # Select data from condition 2
+# Source model for Condition 2
+post.hoc2<-glmer(RECALL ~ GENERATION + SOURCE + (1|CHAIN), newdata2, family = "poisson")
+# Interaction model for Condition 2
+interaction.post.hoc2<-glmer(RECALL ~ GENERATION * SOURCE + (1|CHAIN), newdata2, family = "poisson")
+# Generation-only model for condition 2
+generation.post.hoc2<-glmer(RECALL ~ GENERATION + (1|CHAIN), newdata2, family="poisson")
+# View model for condition 2
+view.post.hoc2<-glmer(RECALL ~ GENERATION + VIEW + (1|CHAIN), newdata2, family = "poisson")
+# Source + view model
+sourceview.post.hoc2<-glmer(RECALL ~ GENERATION + SOURCE+ VIEW + (1|CHAIN), newdata2, family = "poisson")
+# Model comparisons
+AIC(post.hoc2, generation.post.hoc2, interaction.post.hoc2, view.post.hoc2, sourceview.post.hoc2)
+
+# Summary of the Source Model for Condition 2
+library(arm)
+display(post.hoc2)
+# Coefficient Plot of the Source Model for Condition 2
+detach("package:arm", unload=TRUE)
+coefplot(post.hoc2)
+# Summary of the Interaction Model for Condition 2
+library(arm)
+display(interaction.post.hoc2)
+# Coefficient Plot for the Interaction Model for Condition 2
+detach("package:arm", unload=TRUE)
+coefplot(interaction.post.hoc2)
+
+# Summary of the View Model for Condition 2
+library(arm)
+display(view.post.hoc2)
+# Coefficient Plot of the Source Model for Condition 2
+detach("package:arm", unload=TRUE)
+coefplot(view.post.hoc2)
+
+# Summary of the View Model for Condition 2
+library(arm)
+display(sourceview.post.hoc2)
+# Coefficient Plot of the Source Model for Condition 2
+detach("package:arm", unload=TRUE)
+coefplot(sourceview.post.hoc2)
+
+```
+Identical conclusion as for the entire dataset
+
+
+# POSTHOC TEST FOR CONDITION 3
+```{r}
+d <- within(d, SOURCE <- relevel(SOURCE, ref = 'PILOT'))
+#  Condition 3: cleaner vs Head of the Department of Education of a leading university
+newdata3 <- d[ which(d$CONDITION=="C3"), ] # Select data from condition 3
+# Source model for Condition 3
+post.hoc3<-glmer(RECALL ~ GENERATION + SOURCE + (1|CHAIN), newdata3, family = "poisson")
+# Interaction model for Condition 3
+interaction.post.hoc3<-glmer(RECALL ~ GENERATION * SOURCE + (1|CHAIN), newdata3, family = "poisson")
+# Generation-only model for condition 3
+generation.post.hoc3<-glmer(RECALL ~ GENERATION + (1|CHAIN), newdata3, family="poisson")
+# View model for condition 3
+view.post.hoc3<-glmer(RECALL ~ GENERATION + VIEW + (1|CHAIN), newdata3, family = "poisson")
+# Source + view model
+sourceview.post.hoc3<-glmer(RECALL ~ GENERATION + SOURCE+ VIEW + (1|CHAIN), newdata3, family = "poisson")
+# Model comparisons
+AIC(post.hoc3, generation.post.hoc3, interaction.post.hoc3, view.post.hoc3, sourceview.post.hoc3)
+
+# Summary of the Source Model for Condition 3
+library(arm)
+display(post.hoc3)
+# Coefficient Plot of the Source Model for Condition 3
+detach("package:arm", unload=TRUE)
+coefplot(post.hoc3)
+# Summary of the Interaction Model for Condition 3
+library(arm)
+display(interaction.post.hoc3)
+# Coefficient Plot for the Interaction Model for Condition 3
+detach("package:arm", unload=TRUE)
+coefplot(interaction.post.hoc3)
+
+# Summary of the View Model for Condition 3
+library(arm)
+display(view.post.hoc3)
+# Coefficient Plot of the Source Model for Condition 3
+detach("package:arm", unload=TRUE)
+coefplot(view.post.hoc3)
+
+# Summary of the View Model for Condition 3
+library(arm)
+display(sourceview.post.hoc3)
+# Coefficient Plot of the Source Model for Condition 3
+detach("package:arm", unload=TRUE)
+coefplot(sourceview.post.hoc3)
+
+```
+
+Conclusions are the same as for the entire dataset
+
+# ALTERNATIVE WAY TO ANALYSE THE DATA
+Instead of assuming that both the Head of Education of a leading university and the Airline Pilot are high prestige for everybody and that the Head of Education is relevant for the topic but the Airline Pilot is not relevant, we use participants' ratings of prestige and relevance for predicting recall. 
+
+```{r}
+# Prestige model
+mo.5a<-glmer(RECALL ~ GENERATION + PRESTIGE + (1|CHAIN), data = d, family = "poisson")
+# Relevance Model
+mo.5b<-glmer(RECALL ~ GENERATION + RELEVANCE + (1|CHAIN), data = d, family = "poisson")
+# Prestige + Relevance Model
+mo.5c<-glmer(RECALL ~ GENERATION + PRESTIGE + RELEVANCE + (1|CHAIN), data = d, family = "poisson")
+# Interaction Model
+mo.5d<-glmer(RECALL ~ GENERATION + PRESTIGE * RELEVANCE + (1|CHAIN), data = d, family = "poisson")
+# Model Comparisons
+AIC(mo.1b, mo.5a, mo.5b, mo.5c, mo.5d)
+# Coefficient plot for Prestige Model
+coefplot (mo.5a)
+# Summary for Prestige Model
+library(arm)
+display(mo.5a)
+# Coefficient Plot for Relevance Model
+detach("package:arm", unload=TRUE)
+coefplot(mo.5b)
+# Summary for Relevance Model
+library(arm)
+display(mo.5b)
+# Coefficient Plot for Interaction Model
+detach("package:arm", unload=TRUE)
+coefplot(mo.5c)
+# Summary for Interaction Model
+library(arm)
+display(mo.5c)
+```
+
+same conclusion
+```{r}
+# Prestige model
+mo.6a<-glmer(RECALL ~ GENERATION + PRESTIGE + VIEW + (1|CHAIN), data = d, family = "poisson")
+# Relevance Model
+mo.6b<-glmer(RECALL ~ GENERATION + RELEVANCE + VIEW + (1|CHAIN), data = d, family = "poisson")
+# Prestige + Relevance Model
+mo.6c<-glmer(RECALL ~ GENERATION + PRESTIGE + RELEVANCE + VIEW + (1|CHAIN), data = d, family = "poisson")
+# Interaction Model
+mo.6d<-glmer(RECALL ~ GENERATION + PRESTIGE * RELEVANCE + VIEW +(1|CHAIN), data = d, family = "poisson")
+AIC(mo.2a,mo.6a, mo.6b, mo.6c, mo.6d)
+detach("package:arm", unload=TRUE)
+coefplot(mo.6a)
+# Summary for Interaction Model
+library(arm)
+display(mo.6a)
+```
+same conclusion
+
+# PROBLEMS
+ratings of prestige and relevance are assumed to be continuous when they are ordinal. 
+It would be better to model them as monotonic effects. 
+
+Similarly generation should be modelled as a monotonic effect. 
+
+
+# REFERENCES
+Harrison XA. (2014) Using observation-level random effects to model overdispersion in count data in ecology and evolution. PeerJ 2:e616 https://doi.org/10.7717/peerj.616
